@@ -1,0 +1,66 @@
+{
+  "name": "rightforce-vscode",
+  "displayName": "RightForce - Force CLI Context Menu",
+  "description": "VS Code contextual menu commands for force fetch and push",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "forcecli.fetch",
+        "title": "Force Fetch",
+        "category": "Force CLI"
+      },
+      {
+        "command": "forcecli.push",
+        "title": "Force Push",
+        "category": "Force CLI"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "forcecli.fetch",
+          "when": "resourceScheme == file",
+          "group": "navigation"
+        },
+        {
+          "command": "forcecli.push",
+          "when": "resourceScheme == file",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.19.0",
+    "typescript": "^5.7.3"
+  },
+  "publisher": "innersanctum",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/rightforce-vscode.git"
+  }
+}
