@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import { exec } from "child_process";
 import * as path from "path";
 
+const outputChannel = vscode.window.createOutputChannel("Force CLI");
+
 function getRelativePath(uri: vscode.Uri): string {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!workspaceFolder) {
@@ -9,11 +11,8 @@ function getRelativePath(uri: vscode.Uri): string {
         return "";
     }
 
-    // Convert absolute path to relative path
     let relativePath = path.relative(workspaceFolder, uri.fsPath);
-
-    // Convert backslashes to forward slashes
-    relativePath = relativePath.replace(/\\/g, "/");
+    relativePath = relativePath.replace(/\\/g, "/"); // Convert Windows backslashes to forward slashes
 
     return relativePath;
 }
@@ -22,9 +21,19 @@ function runCommand(command: string, uri: vscode.Uri) {
     const relativePath = getRelativePath(uri);
     if (!relativePath) return;
 
-    const terminal = vscode.window.createTerminal("Force CLI");
-    terminal.show();
-    terminal.sendText(`${command} ${relativePath}`);
+    outputChannel.show();
+    outputChannel.appendLine(`Running: ${command} ${relativePath}`);
+
+    exec(`${command} ${relativePath}`, (error, stdout, stderr) => {
+        if (error) {
+            outputChannel.appendLine(`❌ Error: ${error.message}`);
+            vscode.window.showErrorMessage(`Command failed: ${error.message}`);
+            return;
+        }
+        if (stdout) {
+            outputChannel.appendLine(stdout);
+        }
+    });
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -43,4 +52,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(fetchCommand, pushCommand);
 }
 
-export function deactivate() {}
+export function deactivate() {
+    outputChannel.dispose();
+}
