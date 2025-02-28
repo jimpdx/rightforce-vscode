@@ -58,9 +58,9 @@
     "eslint": "^9.19.0",
     "typescript": "^5.7.3"
   },
-  "publisher": "innersanctum",
+  "publisher": "Innersanctum",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/rightforce-vscode.git"
+    "url": "https://github.com/jimpdx/rightforce-vscode.git"
   }
 }
