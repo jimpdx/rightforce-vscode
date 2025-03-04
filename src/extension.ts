@@ -1,8 +1,5 @@
 import * as vscode from "vscode";
-import { exec } from "child_process";
 import * as path from "path";
-
-const outputChannel = vscode.window.createOutputChannel("Force CLI");
 
 function getRelativePath(uri: vscode.Uri): string {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
@@ -17,23 +14,24 @@ function getRelativePath(uri: vscode.Uri): string {
     return relativePath;
 }
 
+function escapeFilePath(filePath: string): string {
+    return filePath.replace(/ /g, "\\ "); // Escape spaces without adding quotes
+}
+
 function runCommand(command: string, uri: vscode.Uri) {
     const relativePath = getRelativePath(uri);
     if (!relativePath) return;
 
-    outputChannel.show();
-    outputChannel.appendLine(`Running: ${command} ${relativePath}`);
+    const escapedPath = escapeFilePath(relativePath);
 
-    exec(`${command} ${relativePath}`, (error, stdout, stderr) => {
-        if (error) {
-            outputChannel.appendLine(`❌ Error: ${error.message}`);
-            vscode.window.showErrorMessage(`Command failed: ${error.message}`);
-            return;
-        }
-        if (stdout) {
-            outputChannel.appendLine(stdout);
-        }
-    });
+    // Check for an existing terminal
+    let terminal = vscode.window.activeTerminal;
+    if (!terminal) {
+        terminal = vscode.window.createTerminal("Force CLI");
+    }
+
+    terminal.show();
+    terminal.sendText(`${command} ${escapedPath}`);
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -52,6 +50,4 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(fetchCommand, pushCommand);
 }
 
-export function deactivate() {
-    outputChannel.dispose();
-}
+export function deactivate() {}
